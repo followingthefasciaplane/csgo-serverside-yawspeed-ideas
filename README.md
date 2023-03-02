@@ -1,1 +1,1 @@
-# csgoyawspeed
+Two methods for CSGO yawspeed
