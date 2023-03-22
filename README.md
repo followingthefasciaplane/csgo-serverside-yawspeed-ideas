@@ -1,1 +1,1 @@
-Two methods for real CSGO yawspeed (hidden cvar)
+Methods for serverside CSGO yawspeed (dysfunctional)
