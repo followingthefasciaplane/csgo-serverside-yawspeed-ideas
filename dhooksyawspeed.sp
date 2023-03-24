@@ -9,10 +9,10 @@ ConVar g_pCl_YawSpeed;
 // Hook function for ConVar_SetFloat
 public MRESReturn ConVar_SetFloat(Handle hParams)
 {
-    void *this = GetParamObject(hParams, 0);
+    void *thisConVar = GetParamObject(hParams, 0);
     float value = GetParamFloat(hParams, 1);
 
-    if (this == view_as<void *>(g_pCl_YawSpeed))
+    if (thisConVar == view_as<void *>(g_pCl_YawSpeed))
     {
         return MRES_Ignore; // Allow setting the value if it's cl_yawspeed
     }
@@ -61,7 +61,7 @@ public void OnPluginStart()
 public void OnPluginEnd()
 {
     // Disable and destroy the hook when the plugin ends
-    if (g_hConVar_SetFloat != INVALID_HANDLE)
+    if (g_hConVar_SetFloat != null)
     {
         DHookEnableDetour(g_hConVar_SetFloat, false);
         CloseHandle(g_hConVar_SetFloat);
