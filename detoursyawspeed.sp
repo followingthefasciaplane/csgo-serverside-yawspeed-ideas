@@ -4,15 +4,15 @@
 
 // Detouring the ConVar_SetFloat function
 Detour g_pConVar_SetFloat;
-ConVar *g_pCl_YawSpeed;
+ConVar g_pCl_YawSpeed;
 
 // Detour function for ConVar_SetFloat
-void ConVar_SetFloat(void *this, float value)
+public void ConVar_SetFloat(void *this, float value)
 {
-    if (this == g_pCl_YawSpeed)
+    if (this == view_as<void *>(g_pCl_YawSpeed))
     {
         // Allow setting the value if it's cl_yawspeed
-        g_pConVar_SetFloat.GetOriginalFunction()(this, value);
+        view_as<function void (void *, float)>(g_pConVar_SetFloat.GetOriginalFunction())(this, value);
     }
 }
 
@@ -45,7 +45,7 @@ public void OnPluginStart()
     g_pCl_YawSpeed = FindConVar("cl_yawspeed");
 
     // Find and detour the ConVar_SetFloat function
-    g_pConVar_SetFloat = Detour.Create(g_pCl_YawSpeed, "SetFloat", "ConVar_SetFloat");
+    g_pConVar_SetFloat = Detour.Create(view_as<void *>(g_pCl_YawSpeed), "SetFloat", ConVar_SetFloat);
     g_pConVar_SetFloat.EnableDetour();
 
     // Register the SetYawSpeedCommand function as a chat command
