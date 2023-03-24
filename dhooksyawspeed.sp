@@ -9,10 +9,10 @@ ConVar g_pCl_YawSpeed;
 // Hook function for ConVar_SetFloat
 public MRESReturn ConVar_SetFloat(Handle hParams)
 {
-    void *thisConVar = GetParamObject(hParams, 0);
+    any thisConVar = GetParamObject(hParams, 0); // Changed void* to any
     float value = GetParamFloat(hParams, 1);
 
-    if (thisConVar == view_as<void*>(g_pCl_YawSpeed)) // Corrected the view_as syntax
+    if (thisConVar == view_as<any>(g_pCl_YawSpeed)) // Changed void* to any
     {
         return MRES_Ignore; // Allow setting the value if it's cl_yawspeed
     }
