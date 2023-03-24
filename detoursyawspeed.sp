@@ -1,6 +1,6 @@
 #include <sourcemod>
 #include <cstrike>
-#include <detours>
+#include <dhooks>
 
 // Detouring the ConVar_SetFloat function
 Detour g_pConVar_SetFloat;
