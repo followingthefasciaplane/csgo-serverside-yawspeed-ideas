@@ -2,18 +2,22 @@
 #include <cstrike>
 #include <dhooks>
 
-// Detouring the ConVar_SetFloat function
-Detour g_pConVar_SetFloat;
+// Hooking the ConVar_SetFloat function
+Handle g_hConVar_SetFloat;
 ConVar g_pCl_YawSpeed;
 
-// Detour function for ConVar_SetFloat
-public void ConVar_SetFloat(void *this, float value)
+// Hook function for ConVar_SetFloat
+public MRESReturn ConVar_SetFloat(Handle hParams)
 {
+    void *this = GetParamObject(hParams, 0);
+    float value = GetParamFloat(hParams, 1);
+
     if (this == view_as<void *>(g_pCl_YawSpeed))
     {
-        // Allow setting the value if it's cl_yawspeed
-        view_as<function void (void *, float)>(g_pConVar_SetFloat.GetOriginalFunction())(this, value);
+        return MRES_Ignore; // Allow setting the value if it's cl_yawspeed
     }
+
+    return MRES_Supercede; // Block setting the value for other ConVars
 }
 
 // Command handler function for the !yawspeed command
@@ -44,9 +48,10 @@ public void OnPluginStart()
     // Find the cl_yawspeed ConVar
     g_pCl_YawSpeed = FindConVar("cl_yawspeed");
 
-    // Find and detour the ConVar_SetFloat function
-    g_pConVar_SetFloat = Detour.Create(view_as<void *>(g_pCl_YawSpeed), "SetFloat", ConVar_SetFloat);
-    g_pConVar_SetFloat.EnableDetour();
+    // Find and hook the ConVar_SetFloat function
+    Address addrSetFloat = FindSendPropInfo("ConVar", "SetFloat");
+    g_hConVar_SetFloat = DHookCreateDetour(addrSetFloat, ConVar_SetFloat, HookType_Raw, CallingConvention_This);
+    DHookEnableDetour(g_hConVar_SetFloat, true);
 
     // Register the SetYawSpeedCommand function as a chat command
     RegAdminCmd("sm_yawspeed", SetYawSpeedCommand, ADMFLAG_GENERIC, "Set your yaw speed");
@@ -55,10 +60,10 @@ public void OnPluginStart()
 // Plugin end function
 public void OnPluginEnd()
 {
-    // Disable and destroy the detour when the plugin ends
-    if (g_pConVar_SetFloat)
+    // Disable and destroy the hook when the plugin ends
+    if (g_hConVar_SetFloat != INVALID_HANDLE)
     {
-        g_pConVar_SetFloat.DisableDetour();
-        delete g_pConVar_SetFloat;
+        DHookEnableDetour(g_hConVar_SetFloat, false);
+        CloseHandle(g_hConVar_SetFloat);
     }
 }
