@@ -53,7 +53,7 @@ public void OnPluginStart()
 
     // Find and hook the ConVar_SetFloat function
     Address addrSetFloat = FindSendPropInfo("ConVar", "SetFloat");
-    g_hConVar_SetFloat = DHookCreate(addrSetFloat, HookType_Raw, ReturnType_Void, ThisPointer_Address, ConVar_SetFloat);
+	g_hConVar_SetFloat = DHookCreateDetour(addrSetFloat, Hook_Pre, ReturnType_Void, ThisPointer_Address);
     DHookAddParam(g_hConVar_SetFloat, HookParamType_ObjectPtr);
     DHookAddParam(g_hConVar_SetFloat, HookParamType_Float);
     DHookEnableDetour(g_hConVar_SetFloat, true, ConVar_SetFloat);
