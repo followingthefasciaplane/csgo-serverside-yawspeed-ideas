@@ -12,7 +12,7 @@ public MRESReturn ConVar_SetFloat(Handle hParams)
     void *thisConVar = GetParamObject(hParams, 0);
     float value = GetParamFloat(hParams, 1);
 
-    if (thisConVar == view_as<void *>(g_pCl_YawSpeed))
+    if (thisConVar == view_as<void*>(g_pCl_YawSpeed)) // Corrected the view_as syntax
     {
         return MRES_Ignore; // Allow setting the value if it's cl_yawspeed
     }
