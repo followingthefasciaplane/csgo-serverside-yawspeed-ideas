@@ -5,11 +5,11 @@ cell g_pfnGetClientCmdArgInt;
 cell g_pfnClientPrint;
 
 // Function signatures for the functions we need to use
-typedef int (GetClientCmdArgIntFn)(int, int);
-typedef void (ClientPrintFn)(int, int, const char, ...);
+function int (GetClientCmdArgIntFn)(int, int);
+function void (ClientPrintFn)(int, int, const char, ...);
 
 // Command handler function for the !yawspeed command
-stock Action:SetYawSpeedCommand(int client)
+public Action SetYawSpeedCommand(int client, int args)
 {
     if (!IsClientInGame(client))
         return Plugin_Handled;
@@ -32,12 +32,12 @@ stock Action:SetYawSpeedCommand(int client)
 }
 
 // Plugin initialization function
-public void PluginInit()
+public void OnPluginStart()
 {
     // Find the addresses of the functions we need to use using signature scanning
     g_pfnGetClientCmdArgInt = FindFunction("engine", "GetClientCmdArgInt");
     g_pfnClientPrint = FindFunction("engine", "ClientPrint");
 
     // Register the SetYawSpeedCommand function as a chat command
-    RegAdminCmd("sm_yawspeed", "Set your yaw speed", ADMFLAG_GENERIC, SetYawSpeedCommand);
+    RegAdminCmd("sm_yawspeed", SetYawSpeedCommand, ADMFLAG_GENERIC, "Set your yaw speed");
 }
