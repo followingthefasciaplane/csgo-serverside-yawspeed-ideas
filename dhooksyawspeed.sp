@@ -10,12 +10,12 @@ ConVar g_pCl_YawSpeed;
 // Hook function for ConVar_SetFloat
 public MRESReturn ConVar_SetFloat(Handle hParams)
 {
-    ConVar thisConVar = view_as<ConVar>(DHookGetParamObjectPtr(hParams, 0));
-    float value = DHookGetParamFloat(hParams, 1);
+    ConVar thisConVar = view_as<ConVar>(DHookGetParamObjectPtrVar(hParams, 0, 0, ObjectValueType_Int));
+    float value = view_as<float>(DHookGetParam(hParams, 1));
 
     if (thisConVar == g_pCl_YawSpeed)
     {
-        return MRES_Ignore; // Allow setting the value if it's cl_yawspeed
+        return MRES_Ignored; // Allow setting the value if it's cl_yawspeed
     }
 
     return MRES_Supercede; // Block setting the value for other ConVars
@@ -53,10 +53,10 @@ public void OnPluginStart()
 
     // Find and hook the ConVar_SetFloat function
     Address addrSetFloat = FindSendPropInfo("ConVar", "SetFloat");
-    g_hConVar_SetFloat = DHookCreate(addrSetFloat, HookType_Raw, ReturnType_Void, ThisPointerType_Pointer, ConVar_SetFloat, HookMode_Post);
+    g_hConVar_SetFloat = DHookCreate(addrSetFloat, HookType_Raw, ReturnType_Void, ThisPointer_Address, ConVar_SetFloat);
     DHookAddParam(g_hConVar_SetFloat, HookParamType_ObjectPtr);
     DHookAddParam(g_hConVar_SetFloat, HookParamType_Float);
-    DHookEnable(g_hConVar_SetFloat, true);
+    DHookEnableDetour(g_hConVar_SetFloat, true, ConVar_SetFloat);
 
     // Register the SetYawSpeedCommand function as a chat command
     RegAdminCmd("sm_yawspeed", SetYawSpeedCommand, ADMFLAG_GENERIC, "Set your yaw speed");
@@ -68,7 +68,7 @@ public void OnPluginEnd()
     // Disable and destroy the hook when the plugin ends
     if (g_hConVar_SetFloat != null)
     {
-        DHookEnable(g_hConVar_SetFloat, false);
+        DHookEnableDetour(g_hConVar_SetFloat, false, ConVar_SetFloat);
         CloseHandle(g_hConVar_SetFloat);
     }
 }
