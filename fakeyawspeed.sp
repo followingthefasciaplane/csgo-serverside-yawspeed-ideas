@@ -113,6 +113,15 @@ void turn(int client, float degrees) {
     TeleportEntity(client, origin, angles, velocity); //theres gotta be a better way than this
 }
 
+// void turn(int client, float degrees) {
+//     float angles[3];
+
+//     GetClientEyeAngles(client, angles);
+//     angles[1] += degrees;
+ //    SetEntPropVector(client, Prop_Send, "m_angEyeAngles", angles);
+//}
+
+
 public void OnClientDisconnect(int client) {
     if (g_turnTimer[client] != null) {
         KillTimer(g_turnTimer[client]);
