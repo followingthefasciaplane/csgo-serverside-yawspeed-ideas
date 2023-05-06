@@ -4,8 +4,11 @@
 
 float g_playerYawspeed[MAXPLAYERS + 1];
 Handle g_turnTimer[MAXPLAYERS + 1];
+float g_timerInterval;
 
 public void OnPluginStart() {
+    g_timerInterval = 1.0 / GetEngineCvarFloat("sv_maxupdaterate");
+
     RegConsoleCmd("sm_setyawspeed", Command_setyawspeed);
     RegConsoleCmd("+sm_turnleft", Command_start_turnleft);
     RegConsoleCmd("-sm_turnleft", Command_stop_turnleft);
@@ -42,7 +45,7 @@ public Action Command_start_turnleft(int client, int args) {
         KillTimer(g_turnTimer[client]);
     }
 
-    g_turnTimer[client] = CreateTimer(0.015, Timer_turn, view_as<int>(client) | (1 << 31), TIMER_REPEAT | TIMER_FLAG_NO_MAPCHANGE);
+    g_turnTimer[client] = CreateTimer(g_timerInterval, Timer_turn, view_as<int>(client) | (1 << 31), TIMER_REPEAT | TIMER_FLAG_NO_MAPCHANGE);
     return Plugin_Handled;
 }
 
@@ -68,7 +71,7 @@ public Action Command_start_turnright(int client, int args) {
         KillTimer(g_turnTimer[client]);
     }
 
-    g_turnTimer[client] = CreateTimer(0.015, Timer_turn, view_as<int>(client), TIMER_REPEAT | TIMER_FLAG_NO_MAPCHANGE);
+    g_turnTimer[client] = CreateTimer(g_timerInterval, Timer_turn, view_as<int>(client), TIMER_REPEAT | TIMER_FLAG_NO_MAPCHANGE);
     return Plugin_Handled;
 }
 
