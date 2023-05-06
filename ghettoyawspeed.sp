@@ -6,31 +6,12 @@ ConVar g_yawspeedCvar;
 Handle g_turnTimer[MAXPLAYERS + 1];
 
 public void OnPluginStart() {
-    g_yawspeedCvar = CreateConVar("sm_yawspeed", "140", "Sets the yawspeed for each player individually.", FCVAR_NOTIFY);
+    g_yawspeedCvar = CreateConVar("sm_yawspeed", "140", "Sets the yawspeed for each player individually.", FCVAR_NOTIFY | FCVAR_REPLICATED);
 
-    RegConsoleCmd("sm_yawspeed", Command_yawspeed);
     RegConsoleCmd("+sm_turnleft", Command_start_turnleft);
     RegConsoleCmd("-sm_turnleft", Command_stop_turnleft);
     RegConsoleCmd("+sm_turnright", Command_start_turnright);
     RegConsoleCmd("-sm_turnright", Command_stop_turnright);
-}
-
-public Action Command_yawspeed(int client, int args) {
-    if (!IsClientConnected(client) || !IsClientInGame(client)) {
-        return Plugin_Handled;
-    }
-
-    if (args > 0) {
-        float newYawspeed = view_as<float>(GetCmdArgInt(1));
-        SDKHooks_SetClientCvar(client, "sm_yawspeed", FloatToString(newYawspeed));
-        PrintToChat(client, "Your yawspeed is now set to %.0f", newYawspeed);
-    } else {
-        char buffer[32];
-        SDKHooks_GetClientCvar(client, "sm_yawspeed", buffer, sizeof(buffer));
-        PrintToChat(client, "Your current yawspeed is %s", buffer);
-    }
-
-    return Plugin_Handled;
 }
 
 public Action Command_start_turnleft(int client, int args) {
@@ -93,9 +74,7 @@ public Action Timer_turn(Handle timer, any data) {
         return Plugin_Stop;
     }
 
-    char buffer[32];
-    SDKHooks_GetClientCvar(client, "sm_yawspeed", buffer, sizeof(buffer));
-    float yawspeed = StringToFloat(buffer) * (isLeft ? -1.0 : 1.0);
+    float yawspeed = GetConVarFloat(g_yawspeedCvar) * (isLeft ? -1.0 : 1.0);
 
     turn(client, yawspeed);
     return Plugin_Continue;
