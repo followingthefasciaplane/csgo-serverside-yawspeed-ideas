@@ -2,16 +2,35 @@
 #include <sdktools>
 #include <sdkhooks>
 
-ConVar g_yawspeedCvar;
+float g_playerYawspeed[MAXPLAYERS + 1];
 Handle g_turnTimer[MAXPLAYERS + 1];
 
 public void OnPluginStart() {
-    g_yawspeedCvar = CreateConVar("sm_yawspeed", "140", "Sets the yawspeed for each player individually.", FCVAR_NOTIFY | FCVAR_REPLICATED);
-
+    RegConsoleCmd("sm_setyawspeed", Command_setyawspeed);
     RegConsoleCmd("+sm_turnleft", Command_start_turnleft);
     RegConsoleCmd("-sm_turnleft", Command_stop_turnleft);
     RegConsoleCmd("+sm_turnright", Command_start_turnright);
     RegConsoleCmd("-sm_turnright", Command_stop_turnright);
+
+    for (int i = 1; i <= MAXPLAYERS; ++i) {
+        g_playerYawspeed[i] = 140.0; // Default yawspeed value
+    }
+}
+
+public Action Command_setyawspeed(int client, int args) {
+    if (!IsClientConnected(client) || !IsClientInGame(client)) {
+        return Plugin_Handled;
+    }
+
+    if (args > 0) {
+        float newYawspeed = view_as<float>(GetCmdArgInt(1));
+        g_playerYawspeed[client] = newYawspeed;
+        PrintToChat(client, "Your yawspeed is now set to %.0f", newYawspeed);
+    } else {
+        PrintToChat(client, "Your current yawspeed is %.0f", g_playerYawspeed[client]);
+    }
+
+    return Plugin_Handled;
 }
 
 public Action Command_start_turnleft(int client, int args) {
@@ -74,7 +93,7 @@ public Action Timer_turn(Handle timer, any data) {
         return Plugin_Stop;
     }
 
-    float yawspeed = GetConVarFloat(g_yawspeedCvar) * (isLeft ? -1.0 : 1.0);
+    float yawspeed = g_playerYawspeed[client] * (isLeft ? -1.0 : 1.0);
 
     turn(client, yawspeed);
     return Plugin_Continue;
