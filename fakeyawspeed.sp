@@ -107,7 +107,7 @@ void turn(int client, float degrees) {
     GetEntPropVector(client, Prop_Data, "m_vecVelocity", velocity);
 
     angles[1] += degrees;
-    TeleportEntity(client, origin, angles, velocity);
+    TeleportEntity(client, origin, angles, velocity); //theres gotta be a better way than this
 }
 
 public void OnClientDisconnect(int client) {
