@@ -7,7 +7,7 @@ Handle g_turnTimer[MAXPLAYERS + 1];
 float g_timerInterval;
 
 public void OnPluginStart() {
-    g_timerInterval = 1.0 / GetTickInterval();
+    g_timerInterval = GetTickInterval();
 
     RegConsoleCmd("sm_setyawspeed", Command_yawspeed);
     RegConsoleCmd("+sm_turnleft", Command_start_turnleft);
