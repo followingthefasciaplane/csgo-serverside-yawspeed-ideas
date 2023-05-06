@@ -9,7 +9,7 @@ float g_timerInterval;
 public void OnPluginStart() {
     g_timerInterval = 1.0 / GetEngineCvarFloat("sv_maxupdaterate");
 
-    RegConsoleCmd("sm_setyawspeed", Command_setyawspeed);
+    RegConsoleCmd("sm_setyawspeed", Command_yawspeed);
     RegConsoleCmd("+sm_turnleft", Command_start_turnleft);
     RegConsoleCmd("-sm_turnleft", Command_stop_turnleft);
     RegConsoleCmd("+sm_turnright", Command_start_turnright);
@@ -20,7 +20,7 @@ public void OnPluginStart() {
     }
 }
 
-public Action Command_setyawspeed(int client, int args) {
+public Action Command_yawspeed(int client, int args) {
     if (!IsClientConnected(client) || !IsClientInGame(client)) {
         return Plugin_Handled;
     }
